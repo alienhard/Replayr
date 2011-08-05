@@ -28,13 +28,14 @@ If you have a different log format, adjust the regex LOGLINE_RE.
 Example:
 `python -u replayr.py --server test.com access.log`
 
-This reads new lines from access.log. You can also pipe to stdin:
+This reads new lines from access.log and sends them to `test.com`. You can also pipe logs to stdin:
 `tail -f access.log | python -u replayr.py --server test.com`
 
 Log output (written to stdout):
 
-- A line like `OK[200] 88 http://somehost.com/path` indicates that the replay succeeded. It returned the same status code as the original request (200) and the request took 88ms to complete.
-- In turn, `FAILED[404 but expected 200]` indicates that the status code received does not match the original status code. Timeouts and other errors are also logged as `FAILED[<error message>]`.
+- A line like `OK[200] 88 http://somehost.com/path` indicates that the replayed request succeeded. It returned the same status code as the original request (200) and the request took 88ms to complete.
+- In turn, `FAILED[404 but expected 200]` indicates that the status code received does not match the original status code.
+- Timeouts and other errors are logged as `FAILED[<error message>]`.
 
 
 ## Exclude certain type of requests (e.g., static assets):
@@ -46,7 +47,7 @@ Example:
 
 ## Replay requests from a production server on a remote test server
 
-You can run replayr.py on the production host to send requests to a test server, but it's better not to do so (e.g., this doubles network traffic). An elegant solution is to pipe log statements via netcat to the test server and replay them there:
+It's better not to replay logs directly from a production system (e.g., this doubles network traffic). A better solution is to first pipe log statements via netcat to the test server and replay them there:
 
 On test host:
 `nc -l -p 13992 | python -u replayr.py -s localhost`
